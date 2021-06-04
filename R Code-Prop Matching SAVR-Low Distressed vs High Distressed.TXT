@@ -1,0 +1,98 @@
+---
+title: "Prop Matching 1:1 - SAVR TAVR PROJECT"
+subtitle: "Prop Matching SAVR Low DCI to High DCI"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+#Reading the Dataset
+```{r}
+options(max.print=999999999)
+options(warn=-1)
+library(tableone)
+library(MatchIt)
+library(Matching)
+library(logitnorm)
+library(readstata13)
+
+data1<-read.dta13(file ="filepath")
+
+# looking at the dimensions of the dataset
+dim(data1)
+
+# looking at any missing values in our dataset
+sum(is.na(data1))
+
+# Converting all the variables of the dataset into categorical variables and numeric types
+#data1[c(1:2)] <- lapply(data1[,c(1:2)] , as.numeric)
+data1$AGE <-  as.numeric(data1$AGE)
+data1[c(2:11)] <- lapply(data1[,c(2:11)] , as.factor)
+# look at data structure
+str(data1[1:11])
+
+print(table(data1$savr_tavr2))
+
+print(prop.table(table(data1$savr_tavr2)))
+
+#covariates we will use (shorter list than you would use in practice)
+xvars<-c("AGE","FEMALE","AMI_AcuteMyocardial","CHF_CongestiveHeart","PVD_Peripheral_Vascular","Diabetes","Diabetes_Complications","CEVD_Cerebrovascular","COPD_ChronicObstructivePulmonary", "CCIcat")
+
+#look at a table 1 Pre Propensity Matching
+table1<- CreateTableOne(vars=xvars,strata="savr_tavr2", data=data1, test=FALSE)
+## include standardized mean difference (SMD)
+print(table1,smd=TRUE)
+```
+#propensity score matching
+```{r}
+#fit a propensity score model. logistic regression
+set.seed(1123)
+psmodel<-glm(savr_tavr2 ~ AGE+FEMALE+AMI_AcuteMyocardial+CHF_CongestiveHeart+PVD_Peripheral_Vascular+Diabetes+Diabetes_Complications+ CEVD_Cerebrovascular+COPD_ChronicObstructivePulmonary+CCIcat,
+             
+    family=binomial(),data=data1)
+
+#show coefficients Summary
+summary(psmodel)
+
+#create propensity score
+pscore<-psmodel$fitted.values
+```
+#do greedy matching on logit(PS) using Match without a caliper and Without Replacement
+```{r}
+library(Matching)
+set.seed(1223)
+psmatch<-Match(Tr=data1$savr_tavr2 == "1",M=1,X=logit(pscore),replace=FALSE)
+
+matched<-data1[unlist(psmatch[c("index.treated","index.control")]), ]
+
+library(foreign)
+save.dta13(matched,file = "filepath")
+
+print(table(matched$savr_tavr2))
+
+print(prop.table(table(matched$savr_tavr2)))
+
+#get standardized differences
+matchedtab1<-CreateTableOne(vars=xvars,strata ="savr_tavr2",data=matched, test = FALSE)
+print(matchedtab1, smd = TRUE)
+
+```
+#Descriptives T-Tests
+```{r}
+
+t.test(LOS~savr_tavr2, mu=0, alt="two.sided", conf=0.95, var.eq=F, paired=F, data = matched)
+
+t.test(NDX~savr_tavr2, mu=0, alt="two.sided", conf=0.95, var.eq=F, paired=F, data = matched)
+
+t.test(NPR~savr_tavr2, mu=0, alt="two.sided", conf=0.95, var.eq=F, paired=F, data = matched)
+
+t.test(NCHRONIC~savr_tavr2, mu=0, alt="two.sided", conf=0.95, var.eq=F, paired=F, data = matched)
+
+t.test(AGE~savr_tavr2, mu=0, alt="two.sided", conf=0.95, var.eq=F, paired=F, data = matched)
+
+
+
+
+```
+
