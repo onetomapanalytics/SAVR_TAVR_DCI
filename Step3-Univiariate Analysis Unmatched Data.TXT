@@ -1,0 +1,139 @@
+Step 4  Detailed univariate analaysi for the unmatched data 
+
+
+use "file path"
+
+
+tab YEAR 
+
+tab savr_tavr  
+
+summarize AGE if savr_tavr == 0 
+summarize AGE if savr_tavr == 1
+
+summarize NCHRONIC if savr_tavr == 0 
+summarize NCHRONIC if savr_tavr == 1
+
+summarize LOS if savr_tavr == 0 
+summarize LOS if savr_tavr == 1
+
+summarize DistressScore 
+
+summarize DistressScore if savr_tavr == 0 
+summarize DistressScore if savr_tavr == 1
+
+**************************************************************
+
+tab Quintile5Distressed 
+
+tab Quintile5Distressed if savr_tavr == 0 
+
+tab Quintile5Distressed if savr_tavr == 1 
+
+tab Quintile5Distressed savr_tavr 
+
+*Places are sorted into quintiles based on their performance on the index: 
+
+*1-Prosperous
+*2-comfortable
+*3-mid-tier
+*4-at risk
+*5-distressed
+
+tab FEMALE if savr_tavr == 0
+
+tab FEMALE if savr_tavr == 1
+
+replace RACE = 6 if RACE == 4 | RACE == 5 
+
+tab RACE if savr_tavr == 0
+tab RACE if savr_tavr == 1
+
+replace PAY1 = 6 if PAY1 == 4 | PAY1 == 5 
+
+tab PAY1 if savr_tavr == 0
+tab PAY1 if savr_tavr == 1
+
+replace ATYPE = 3 if ATYPE == 5
+
+tab ATYPE if savr_tavr == 0
+tab ATYPE if savr_tavr == 1
+
+tab CCIcat if savr_tavr == 0
+tab CCIcat if savr_tavr == 1
+
+tab PL_UR_CAT4 if savr_tavr == 0
+tab PL_UR_CAT4 if savr_tavr == 1
+
+tab MEDINCSTQ if savr_tavr == 0
+tab MEDINCSTQ if savr_tavr == 1
+
+tab DISPUNIFORM if savr_tavr == 0
+tab DISPUNIFORM if savr_tavr == 1
+**************************************************************
+tab AMI_AcuteMyocardial if savr_tavr == 0
+tab AMI_AcuteMyocardial if savr_tavr == 1
+
+tab CHF_CongestiveHeart if savr_tavr == 0
+tab CHF_CongestiveHeart if savr_tavr == 1
+
+tab PVD_Peripheral_Vascular if savr_tavr == 0
+tab PVD_Peripheral_Vascular if savr_tavr == 1
+
+tab Diabetes if savr_tavr == 0
+tab Diabetes if savr_tavr == 1
+
+tab Diabetes_Complications if savr_tavr == 0
+tab Diabetes_Complications if savr_tavr == 1
+
+tab CEVD_Cerebrovascular if savr_tavr == 0
+tab CEVD_Cerebrovascular if savr_tavr == 1
+
+tab COPD_ChronicObstructivePulmonary if savr_tavr == 0
+tab COPD_ChronicObstructivePulmonary if savr_tavr == 1
+**************************************************************
+**************************************************************
+*Table 1- T tests 
+
+ttest AGE, by(savr_tavr) unequal
+
+ttest NCHRONIC, by(savr_tavr) unequal
+
+ttest LOS, by(savr_tavr) unequal
+
+ttest DistressScore, by(savr_tavr) unequal
+*Table 1 Chi Square Test 
+
+
+tab FEMALE savr_tavr, row col chi2
+
+tab RACE savr_tavr, row col chi2
+
+tab PAY1 savr_tavr, row col chi2
+
+tab ATYPE savr_tavr, row col chi2
+
+tab CCIcat savr_tavr, row col chi2
+
+tab PL_UR_CAT4 savr_tavr, row col chi2
+
+tab MEDINCSTQ savr_tavr, row col chi2
+
+tab DISPUNIFORM savr_tavr, row col chi2
+
+
+
+tab AMI_AcuteMyocardial savr_tavr, row col chi2
+
+tab CHF_CongestiveHeart savr_tavr, row col chi2
+
+tab PVD_Peripheral_Vascular savr_tavr, row col chi2
+
+tab Diabetes savr_tavr, row col chi2
+
+tab Diabetes_Complications savr_tavr, row col chi2
+
+tab CEVD_Cerebrovascular savr_tavr, row col chi2
+
+tab COPD_ChronicObstructivePulmonary savr_tavr, row col chi2
+

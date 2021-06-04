@@ -1,0 +1,152 @@
+Step 1 of data cleaning and preperation. 
+
+Using the HCUP SID files, basic cleaning was performed, charlson comorbidity index was calcualted using STATA module, and post op surgical complications were coded. 
+
+This step was repeated for each year (2012-2015) for WA and FL files.
+
+use "filepath"
+
+drop YEAR
+rename *, upper
+*drop _merge
+drop if AGE<18
+drop if AGE==.
+rename VISITLINK VisitLink
+rename DAYSTOEVENT DaysToEvent
+drop if VisitLink==.
+drop if DaysToEvent==.
+
+gen AHAID_n = real(AHAID)
+rename AHAID AHAID_str
+rename AHAID_n AHAID
+
+/*destring AHAID,replace*/
+
+***************REMEMBER TO CHECK FOR DX1-DX25!!!!!!!!!!!*****************
+charlson DX1-DX31, index (c) assign0 noshow
+rename charlindex CCI
+rename grpci CCIcat
+***************REMEMBER TO CHECK FOR DX1-DX25!!!!!!!!!!!*****************
+
+********************************************************************************
+//POSTOP Complications
+*Number of DX codes to analyze
+***************REMEMBER TO CHECK FOR n=25!!!!!!!!!!!!!!!!!!!!!!*****************
+local n = 31
+
+#1.Post Operative Pulmonary Embolism */
+gen PE=0
+forvalues j = 1/`n' {
+replace PE=1 if inlist(DX`j', "4151", "41511", "41512")& DXPOA`j' != "Y"
+replace PE=1 if inlist(DX`j', "41513", "41519") & DXPOA`j' != "Y"
+}
+ 
+#2. Post Operative MI */
+gen MI=0
+forvalues j = 1/`n' {
+replace MI = 1 if inlist(DX`j', "41000", "41010", "41020", "41030", "41040") & DXPOA`j' != "Y"
+replace MI = 1 if inlist(DX`j', "41050", "41060", "41070", "41080", "41090") & DXPOA`j' != "Y"
+replace MI = 1 if inlist(DX`j', "41001", "41011", "41021", "41031", "41041") & DXPOA`j' != "Y"
+replace MI = 1 if inlist(DX`j', "41051", "41061", "41071", "41081", "41091") & DXPOA`j' != "Y"
+replace MI = 1 if inlist(DX`j', "410", "4100", "41002", "41012", "4102") & DXPOA`j' != "Y"
+replace MI = 1 if inlist(DX`j', "41022", "4103", "41032", "4104", "41042") & DXPOA`j' != "Y"
+replace MI = 1 if inlist(DX`j', "4105", "41052", "4106", "41062", "4107") & DXPOA`j' != "Y"
+replace MI = 1 if inlist(DX`j', "41072", "4108", "41082", "4109", "41092") & DXPOA`j' != "Y"
+}
+
+#3. Sepsis
+gen Sepsis=0
+forvalues j = 1/`n' {
+replace Sepsis=1 if inlist(DX`j', "78552", "99591", "99592", "99802") & DXPOA`j' != "Y"
+replace Sepsis=1 if inlist(DX`j', "99859", "99931", "038", "0380", "0381") & DXPOA`j' != "Y"
+replace Sepsis=1 if inlist(DX`j', "03810", "03811", "03812", "03819", "0382") & DXPOA`j' != "Y"
+replace Sepsis=1 if inlist(DX`j', "0383",  "0384", "03840", "03841", "03842", "03843") & DXPOA`j' != "Y"
+replace Sepsis=1 if inlist(DX`j', "03844", "03849", "0388", "0389" ) & DXPOA`j' != "Y"
+replace Sepsis = 1 if inlist(DX`j', "7907", "0200", "1179", "1125", "11281") & DXPOA`j' != "Y"
+}
+ 
+#4. UTI
+gen UTI=0
+forvalues j = 1/`n' {
+replace UTI=1 if inlist(DX`j', "1122", "5903", "5950", "5953", "5590") & DXPOA`j' == "Y"
+replace UTI=1 if inlist(DX`j', "59010", "59011", "59080", "59081", "5990") & DXPOA`j' == "Y"
+}
+  
+#5.  PNA
+gen PNA=0
+forvalues j = 1/`n' {
+replace PNA=1 if inlist(DX`j', "0391",  "1124", "1179", "1363", "46619", "4870") & DXPOA`j' != "Y"
+replace PNA=1 if inlist(DX`j', "5130",  "5168", "99731", "480", "4800", "4801") & DXPOA`j' != "Y"
+replace PNA=1 if inlist(DX`j', "4802",  "4803", "4808", "4809", "482", "4820") & DXPOA`j' != "Y"
+replace PNA=1 if inlist(DX`j', "4821",  "4822", "4823", "48230", "48231", "48232") & DXPOA`j' != "Y"
+replace PNA=1 if inlist(DX`j', "48239", "4824", "48240", "48241", "48242", "48249") & DXPOA`j' != "Y"
+replace PNA=1 if inlist(DX`j', "4828",  "48281", "48282", "48283", "48284", "48289") & DXPOA`j' != "Y"
+replace PNA=1 if inlist(DX`j', "4829",  "483",  "4830", "4831", "4838", "485", "486") & DXPOA`j' != "Y"
+replace PNA=1 if inlist(DX`j', "481",   "484",  "4841", "4843", "4845", "4846", "4847") & DXPOA`j' != "Y"
+replace PNA=1 if inlist(DX`j', "4848",  "507",  "5070", "5071", "5078") & DXPOA`j' != "Y"
+}
+
+#6. DVT
+gen DVT=0
+forvalues j = 1/`n' {
+replace  DVT=1 if inlist(DX`j', "4512", "45181", "4519", "4538", "4539", "4534", "45111") & DXPOA`j' != "Y"
+replace  DVT=1 if inlist(DX`j', "45119", "4512", "4518", "45181", "45182", "45183", "45189") & DXPOA`j' != "Y"
+replace  DVT=1 if inlist(DX`j', "4519", "4534", "45340", "45341", "45342") & DXPOA`j' != "Y"
+}
+
+#7. Surgical Site Infection  
+gen Infection=0
+forvalues j = 1/`n' {
+replace Infection=1 if inlist(DX`j', "9985", "99851", "99859") & DXPOA`j' != "Y"
+}
+
+#8 Aspiration 
+gen Aspiration=0
+forvalues j = 1/`n' {
+replace Aspiration=1 if inlist(DX`j', "507", "9973") & DXPOA`j' != "Y"
+}
+
+#9 Cardiac Complications 
+gen Cardiac=0
+forvalues j = 1/`n' {
+replace Cardiac=1 if inlist(DX`j', "9971") & DXPOA`j' != "Y"
+}
+
+#10 Pulmonary Insuficiency
+gen Pulmonary=0
+forvalues j = 1/`n' {
+replace Cardiac=1 if inlist(DX`j', "5184", " 5185", "5188") & DXPOA`j' != "Y"
+}
+
+#11 Acute Renal Failure  
+gen Renal=0
+forvalues j = 1/`n' {
+replace Renal=1 if inlist(DX`j', "584") & DXPOA`j' != "Y"
+}
+
+#12 Surgical Complications After Procedure 
+gen Surgery_Complications=0
+forvalues j = 1/`n' {
+replace Surgery_Complications=1 if inlist(DX`j', "9981", "9982", "9983") & DXPOA`j' != "Y"
+}
+
+
+gen tavr_savr = . 
+
+foreach v of var PR1{
+
+replace tavr_savr = 1 if `v' == "02RF37H" | `v' ==  "02RF37Z" | `v' ==  "02RF38H" | `v' ==  "02RF3JH" | `v' ==  "02RF3JZ" | `v' ==  "02RF3KH" | `v' ==  "02RF3KZ" | `v' ==  "3505" | `v' ==  "3506"
+}
+
+foreach v of var PR1{
+
+replace tavr_savr = 2 if `v'=="02RF07Z" | `v' ==  "02RF08Z" | `v' ==  "02RF0KZ" | `v' ==  "02RF47Z" | `v' ==  "02RF48Z" | `v' ==  "02RF4KZ" | `v' ==  "X2RF032" | `v' ==  "X2RF432" | `v' ==  "3521" | `v' ==  "3522"
+ 
+}
+
+
+tab tavr_savr 
+
+drop if tavr_savr == .
+
+save "filepath", replace 

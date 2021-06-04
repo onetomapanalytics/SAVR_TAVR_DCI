@@ -1,0 +1,204 @@
+Step 4  Detailed univariate analaysi for the matched data 
+
+use "file path"
+
+tab YEAR 
+
+tab savr_tavr  
+
+gen savr_tavr_2 = .  
+
+replace savr_tavr_2 = 0 if savr_tavr == 1 
+replace savr_tavr_2 = 1 if savr_tavr == 2 
+
+tab savr_tavr_2
+
+summarize NCHRONIC if savr_tavr == 1 
+summarize NCHRONIC if savr_tavr == 2
+
+summarize NCHRONIC if savr_tavr_2 == 0 
+summarize NCHRONIC if savr_tavr_2 == 1
+
+drop savr_tavr
+rename savr_tavr_2 savr_tavr
+
+summarize DistressScore if savr_tavr == 0 
+summarize DistressScore if savr_tavr == 1
+
+**************************************************************
+
+tab Quintile5Distressed 
+
+tab Quintile5Distressed if savr_tavr == 0 
+
+tab Quintile5Distressed if savr_tavr == 1 
+
+tab Quintile5Distressed savr_tavr 
+**************************************************************
+**************************************************************
+*Table 3- T tests 
+
+ttest AGE, by(savr_tavr) unequal
+
+ttest NCHRONIC, by(savr_tavr) unequal
+
+ttest LOS, by(savr_tavr) unequal
+
+ttest DistressScore, by(savr_tavr) unequal
+*Table 1 Chi Square Test 
+
+************************************************
+
+tab DIED if savr_tavr == 0 
+tab DIED if savr_tavr == 1 
+
+tab DIED savr_tavr, row col chi2
+
+tab CCIcat if savr_tavr == 0 
+tab CCIcat if savr_tavr == 1 
+ 
+tab CCIcat savr_tavr, row col chi2
+
+
+tab PE if savr_tavr == 0 
+tab PE if savr_tavr == 1 
+
+tab PE savr_tavr, row col chi2
+
+
+tab MI if savr_tavr == 0 
+tab MI if savr_tavr == 1 
+
+tab MI savr_tavr, row col chi2
+
+
+tab Sepsis if savr_tavr == 0 
+tab Sepsis if savr_tavr == 1 
+
+tab Sepsis savr_tavr, row col chi2
+
+tab UTI if savr_tavr == 0 
+tab UTI if savr_tavr == 1 
+
+tab UTI savr_tavr, row col chi2
+
+tab PNA  if savr_tavr == 0 
+tab PNA  if savr_tavr == 1 
+
+tab PNA  savr_tavr, row col chi2
+
+tab DVT  if savr_tavr == 0 
+tab DVT  if savr_tavr == 1 
+
+tab DVT  savr_tavr, row col chi2
+
+
+tab Infection  if savr_tavr == 0 
+tab Infection  if savr_tavr == 1 
+
+tab Infection  savr_tavr, row col chi2
+
+
+tab Cardiac  if savr_tavr == 0 
+tab Cardiac  if savr_tavr == 1 
+
+tab Cardiac  savr_tavr, row col chi2
+
+ 
+tab Surgery_Complications  if savr_tavr == 0 
+tab Surgery_Complications  if savr_tavr == 1 
+
+tab Surgery_Complications  savr_tavr, row col chi2
+
+
+
+******************************************************************
+******************************************************************
+gen savr_tavr4 = .   
+
+replace savr_tavr4 = 0 if Quintile5Distressed == 4 & savr_tavr == 0 | Quintile5Distressed == 5 & savr_tavr == 0
+
+replace savr_tavr4 = 1 if Quintile5Distressed == 4 & savr_tavr == 1 | Quintile5Distressed == 5 & savr_tavr == 1
+ 
+tab savr_tavr4
+
+******************************************************************
+
+ **************************************************************
+*Table 3- T tests 
+
+ttest AGE, by(savr_tavr4) unequal
+
+ttest NCHRONIC, by(savr_tavr4) unequal
+
+ttest LOS, by(savr_tavr4) unequal
+
+ttest DistressScore, by(savr_tavr4) unequal
+*Table 1 Chi Square Test 
+
+************************************************
+
+tab DIED if savr_tavr4 == 0 
+tab DIED if savr_tavr4 == 1 
+
+tab DIED savr_tavr4, row col chi2
+
+tab CCIcat if savr_tavr4 == 0 
+tab CCIcat if savr_tavr4 == 1 
+ 
+tab CCIcat savr_tavr4, row col chi2
+
+
+tab PE if savr_tavr4 == 0 
+tab PE if savr_tavr4 == 1 
+
+tab PE savr_tavr4, row col chi2
+
+
+tab MI if savr_tavr4 == 0 
+tab MI if savr_tavr4 == 1 
+
+tab MI savr_tavr4, row col chi2
+
+
+tab Sepsis if savr_tavr4 == 0 
+tab Sepsis if savr_tavr4 == 1 
+
+tab Sepsis savr_tavr4, row col chi2
+
+tab UTI if savr_tavr4 == 0 
+tab UTI if savr_tavr4 == 1 
+
+tab UTI savr_tavr4, row col chi2
+
+tab PNA  if savr_tavr4 == 0 
+tab PNA  if savr_tavr4 == 1 
+
+tab PNA  savr_tavr4, row col chi2
+
+tab DVT  if savr_tavr4 == 0 
+tab DVT  if savr_tavr4 == 1 
+
+tab DVT  savr_tavr4, row col chi2
+
+
+tab Infection  if savr_tavr4 == 0 
+tab Infection  if savr_tavr4 == 1 
+
+tab Infection  savr_tavr4, row col chi2
+
+
+tab Cardiac  if savr_tavr4 == 0 
+tab Cardiac  if savr_tavr4 == 1 
+
+tab Cardiac  savr_tavr4, row col chi2
+
+ 
+tab Surgery_Complications  if savr_tavr4 == 0 
+tab Surgery_Complications  if savr_tavr4 == 1 
+
+tab Surgery_Complications  savr_tavr4, row col chi2
+
+
+
+******************************************************************

@@ -1,0 +1,29 @@
+Step 2 Linking with DCI data 
+
+Data from step 1 was linked with DCI data using zipcode. 
+
+This step was repeated for each year (2012-2015) for WA and FL files.
+
+use "filepath"
+
+rename ZIP Zipcode
+
+gen Zipcode_n = real(Zipcode)
+mdesc Zipcode Zipcode_n
+rename Zipcode Zipcode_str
+rename Zipcode_n Zipcode
+
+codebook Zipcode
+
+merge m:1 Zipcode using "filepath"
+
+keep if _merge==3
+
+drop _merge 
+
+tab tavr_savr
+
+save "filepath", replace
+*****************
+
+Step 3 All the individual yearly files from Step 2 were appeneded(stacked) together to make one master file. 
